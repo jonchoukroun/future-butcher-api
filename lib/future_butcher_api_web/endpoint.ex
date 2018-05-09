@@ -35,8 +35,8 @@ defmodule FutureButcherApiWeb.Endpoint do
     key: "_future_butcher_api_key",
     signing_salt: "OoIwILWJ"
 
-  plug Plug.CORSPlug
-  
+  plug CORSPlug
+
   plug FutureButcherApiWeb.Router
 
   @doc """
