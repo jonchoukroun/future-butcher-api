@@ -39,6 +39,7 @@ defmodule FutureButcherApi.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
+      {:cors_plug, "~> 1.5"},
       {:cipher, ">= 1.3.4"},
       {:faker, "~> 0.10.0"},
       {:future_butcher_engine, path: "../future_butcher_engine"}
