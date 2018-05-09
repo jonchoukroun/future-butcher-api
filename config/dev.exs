@@ -44,3 +44,8 @@ config :future_butcher_api, FutureButcherApi.Repo,
   database: "future_butcher_api_dev",
   hostname: "localhost",
   pool_size: 10
+
+config :cipher,
+  keyphrase: "secretdevkeyphrase",
+  ivphrase: "secretdevivphrase",
+  magic_token: "secretdevmagictoken"

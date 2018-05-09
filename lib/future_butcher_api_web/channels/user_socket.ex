@@ -2,7 +2,7 @@ defmodule FutureButcherApiWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", FutureButcherApiWeb.RoomChannel
+  channel "game:*", FutureButcherApiWeb.GameChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

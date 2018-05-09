@@ -5,6 +5,11 @@
 # is restricted to this project.
 use Mix.Config
 
+config :future_butcher_api, FutureButcherInterface.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "future_butcher_interface",
+  hostname: "localhost"
+
 # General application configuration
 config :future_butcher_api,
   ecto_repos: [FutureButcherApi.Repo]

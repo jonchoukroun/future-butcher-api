@@ -12,6 +12,7 @@ defmodule FutureButcherApi.Application do
       supervisor(FutureButcherApi.Repo, []),
       # Start the endpoint when the application starts
       supervisor(FutureButcherApiWeb.Endpoint, []),
+      supervisor(FutureButcherApiWeb.Presence, []),
       # Start your own worker by calling: FutureButcherApi.Worker.start_link(arg1, arg2, arg3)
       # worker(FutureButcherApi.Worker, [arg1, arg2, arg3]),
     ]
