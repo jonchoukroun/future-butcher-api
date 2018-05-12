@@ -42,7 +42,6 @@ defmodule FutureButcherApiWeb.GameChannel do
   def handle_in("restore_game_state", name, socket) do
     case :sys.get_state Game.via_tuple(name) do
       state_data -> reply_success(state_data, socket)
-      :error     -> reply_failure('No existing game', socket)
     end
   end
 
@@ -110,17 +109,22 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  defp persist_player(%{"screen_name" => name, "player_hash" => player_hash}) do
-    hash_id = Enum.join([name, player_hash], ":")
+  defp persist_player(%{"screen_name" => name}) do
+    hash_id = generate_player_hash(name)
 
     case Repo.get_by(Player, %{hash_id: hash_id}) do
       nil ->
         Repo.insert!(%Player{
           name: name,
-          hash_id: Enum.join([name, player_hash], ":")
+          hash_id: hash_id
           })
       _struct -> :ok
     end
+  end
+
+  defp generate_player_hash(name) when is_binary(name) do
+    Enum.join([name, Ecto.DateTime.utc], "%%")
+    |> Cipher.encrypt
   end
 
   defp retrieve_scores(), do: retrieve_scores(100)
