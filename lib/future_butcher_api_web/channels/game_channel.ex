@@ -6,16 +6,30 @@ defmodule FutureButcherApiWeb.GameChannel do
   alias FutureButcherApi.{Repo, Player, Score}
   alias FutureButcherApiWeb.Presence
 
-  def join("game:" <> _player, %{"screen_name" => name} = payload, socket) do
+  def join("game:" <> _player, %{"player_name" => name, "hash_id" => hash_id} = payload, socket) do
     if authorized?(socket) do
       send(self(), {:after_join, name})
 
-      persist_player(payload)
-
-      {:ok, socket}
+      retrieve_player(payload)
+      {:ok, %{hash_id: hash_id}, socket}
     else
-      {:error, %{reason: "Unauthorized"} }
+      {:error, %{reason: "Unauthorized"}}
     end
+  end
+
+  def join("game:" <> _player, %{"player_name" => name} = payload, socket) do
+    if authorized?(socket) do
+      send(self(), {:after_join, name})
+
+      player = persist_player(payload)
+      {:ok, %{hash_id: player.hash_id}, socket}
+    else
+      {:error, %{reason: "Unauthorized"}}
+    end
+  end
+
+  def join("game:" <> _player, _payload) do
+    {:error, %{reason: "Invalid payload"}}
   end
 
   def handle_info({:after_join, screen_name}, socket) do
@@ -109,17 +123,15 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  defp persist_player(%{"screen_name" => name}) do
-    hash_id = generate_player_hash(name)
+  defp retrieve_player(%{"player_name" => name, "hash_id" => hash_id}) do
+    IO.inspect(name, label: "name")
+    IO.inspect(hash_id, label: "hash")
+    Repo.get_by!(Player, %{hash_id: hash_id, name: name})
+  end
 
-    case Repo.get_by(Player, %{hash_id: hash_id}) do
-      nil ->
-        Repo.insert!(%Player{
-          name: name,
-          hash_id: hash_id
-          })
-      _struct -> :ok
-    end
+  defp persist_player(%{"player_name" => name}) do
+    hash_id = generate_player_hash(name)
+    Repo.insert!(%Player{name: name, hash_id: hash_id})
   end
 
   defp generate_player_hash(name) when is_binary(name) do
