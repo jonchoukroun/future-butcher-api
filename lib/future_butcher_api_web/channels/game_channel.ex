@@ -95,7 +95,7 @@ defmodule FutureButcherApiWeb.GameChannel do
   def handle_in("buy_cut", payload, socket) do
     %{"cut" => cut, "amount" => amount} = payload
     cut    = String.to_existing_atom cut
-    amount = String.to_integer amount
+    amount = format_integer amount
 
     case Game.buy_cut(via(socket.topic), cut, amount) do
       {:ok, state_data} -> reply_success(state_data, socket)
@@ -107,7 +107,7 @@ defmodule FutureButcherApiWeb.GameChannel do
   def handle_in("sell_cut", payload, socket) do
     %{"cut" => cut, "amount" => amount} = payload
     cut    = String.to_existing_atom cut
-    amount = String.to_integer amount
+    amount = format_integer amount
 
     case Game.sell_cut(via(socket.topic), cut, amount) do
       {:ok, state_data} -> reply_success(state_data, socket)
@@ -125,6 +125,9 @@ defmodule FutureButcherApiWeb.GameChannel do
       error             -> reply_failure(error, socket)
     end
   end
+
+  defp format_integer(int) when is_binary(int), do: String.to_integer(int)
+  defp format_integer(int) when is_integer(int), do: int
 
   defp retrieve_player(%{"player_name" => name, "hash_id" => hash_id}) do
     Repo.get_by!(Player, %{hash_id: hash_id, name: name})
