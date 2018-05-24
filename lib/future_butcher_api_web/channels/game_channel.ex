@@ -116,8 +116,8 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def handle_in("pay_debt", payload, socket) do
-    %{"amount" => amount} = payload
+  def handle_in("pay_debt", %{"amount" => amount}, socket) do
+    amount = format_integer amount
 
     case Game.pay_debt(via(socket.topic), amount) do
       {:ok, state_data} -> reply_success(state_data, socket)
