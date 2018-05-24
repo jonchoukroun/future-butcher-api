@@ -54,8 +54,11 @@ defmodule FutureButcherApiWeb.GameChannel do
   end
 
   def handle_in("restore_game_state", name, socket) do
-    case :sys.get_state Game.via_tuple(name) do
-      state_data -> reply_success(state_data, socket)
+    case GenServer.whereis(Game.via_tuple(name)) do
+      nil  -> reply_failure("No existing process", socket)
+      _pid ->
+        :sys.get_state(Game.via_tuple(name))
+        |> reply_success(socket)
     end
   end
 
@@ -124,8 +127,6 @@ defmodule FutureButcherApiWeb.GameChannel do
   end
 
   defp retrieve_player(%{"player_name" => name, "hash_id" => hash_id}) do
-    IO.inspect(name, label: "name")
-    IO.inspect(hash_id, label: "hash")
     Repo.get_by!(Player, %{hash_id: hash_id, name: name})
   end
 
