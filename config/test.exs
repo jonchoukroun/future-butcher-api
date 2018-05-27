@@ -16,4 +16,10 @@ config :future_butcher_api, FutureButcherApi.Repo,
   password: "postgres",
   database: "future_butcher_api_test",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool: Ecto.Adapters.SQL.Sandbox,
+  pool_size: 10
+
+config :cipher,
+  keyphrase: "secretdevkeyphrase",
+  ivphrase: "secretdevivphrase",
+  magic_token: "secretdevmagictoken"
