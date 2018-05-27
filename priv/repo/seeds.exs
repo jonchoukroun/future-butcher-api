@@ -23,7 +23,7 @@ defmodule FutureButcherApi.Seeder do
     Repo.insert! %Player{
       name:    name,
       email:   Faker.Internet.email(),
-      hash_id: Enum.join([name, Ecto.DateTime.utc], "%%") |> Cipher.encrypt)
+      hash_id: Enum.join([name, Ecto.DateTime.utc], "%%") |> Cipher.encrypt
     }
   end
 
