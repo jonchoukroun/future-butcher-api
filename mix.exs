@@ -5,7 +5,11 @@ defmodule FutureButcherApi.Mixfile do
     [
       app: :future_butcher_api,
       version: "0.0.1",
-      elixir: "~> 1.4",
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
+      elixir: "~> 1.6.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       start_permanent: Mix.env == :prod,
@@ -42,7 +46,7 @@ defmodule FutureButcherApi.Mixfile do
       {:cors_plug, "~> 1.5"},
       {:cipher, ">= 1.3.4"},
       {:faker, "~> 0.10.0"},
-      {:future_butcher_engine, path: "../future_butcher_engine"}
+      {:future_butcher_engine, in_umbrella: true}
     ]
   end
 
