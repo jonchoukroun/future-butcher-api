@@ -36,5 +36,5 @@ defmodule FutureButcherApi.Seeder do
 
 end
 
-(1..25) |> Enum.each fn _ -> FutureButcherApi.Seeder.insert_player end
-(1..200) |> Enum.each fn _ -> FutureButcherApi.Seeder.insert_score end
+(1..25) |> Enum.each(fn _ -> FutureButcherApi.Seeder.insert_player end)
+(1..200) |> Enum.each(fn _ -> FutureButcherApi.Seeder.insert_score end)
