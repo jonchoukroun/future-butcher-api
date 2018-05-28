@@ -2,7 +2,7 @@ use Mix.Config
 
 config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   http: [port: 4000],
-  url: [host: "futurebutcher.com", port: 80],
+  url: [host: "localhost", port: 80],
   server: true,
   root: ".",
   code_reloader: false,
