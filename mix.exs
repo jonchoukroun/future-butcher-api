@@ -46,6 +46,7 @@ defmodule FutureButcherApi.Mixfile do
       {:cors_plug, "~> 1.5"},
       {:cipher, ">= 1.3.4"},
       {:faker, "~> 0.10.0"},
+      {:pid_file, "~> 0.1.1"},
       {:future_butcher_engine, in_umbrella: true}
     ]
   end
