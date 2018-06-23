@@ -14,7 +14,7 @@ defmodule FutureButcherApi.Application do
       supervisor(FutureButcherApiWeb.Endpoint, []),
       supervisor(FutureButcherApiWeb.Presence, []),
       # Start your own worker by calling: FutureButcherApi.Worker.start_link(arg1, arg2, arg3)
-      # worker(FutureButcherApi.Worker, [arg1, arg2, arg3]),
+      worker(PidFile.Worker, [[file: "/home/deploy/app_release/future_butcher_api.pid"]]),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
