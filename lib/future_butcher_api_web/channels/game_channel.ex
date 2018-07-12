@@ -75,7 +75,7 @@ defmodule FutureButcherApiWeb.GameChannel do
     persist_score_if_valid(payload)
 
     case GameSupervisor.stop_game(player) do
-      :ok              -> reply_success(retrieve_scores(5), socket)
+      :ok              -> reply_success(retrieve_scores(25), socket)
       {:error, reason} -> reply_failure(reason, socket)
     end
   end
