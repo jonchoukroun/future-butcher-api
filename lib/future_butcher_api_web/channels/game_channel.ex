@@ -92,11 +92,11 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def handle_in("buy_loan", %{"principle" => principle, "interest" => interest}, socket) do
-    principle = format_integer principle
-    interest  = format_float interest
+  def handle_in("buy_loan", %{"debt" => debt, "rate" => rate}, socket) do
+    debt = format_integer debt
+    rate = format_float rate
 
-    case Game.buy_loan(via(socket.topic), principle, interest) do
+    case Game.buy_loan(via(socket.topic), debt, rate) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
       error             -> reply_failure(error, socket)
