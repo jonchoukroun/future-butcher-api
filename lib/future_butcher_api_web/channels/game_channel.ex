@@ -92,6 +92,17 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
+  def handle_in("buy_loan", %{"principle" => principle, "interest" => interest}, socket) do
+    principle = format_integer principle
+    interest  = format_float interest
+
+    case Game.buy_loan(via(socket.topic), principle, interest) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
   def handle_in("buy_cut", payload, socket) do
     %{"cut" => cut, "amount" => amount} = payload
     cut    = String.to_existing_atom cut
@@ -128,6 +139,9 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   defp format_integer(int) when is_binary(int), do: String.to_integer(int)
   defp format_integer(int) when is_integer(int), do: int
+
+  defp format_float(float) when is_binary(float), do: String.to_float(float)
+  defp format_float(float) when is_float(float), do: float
 
   defp retrieve_player(%{"player_name" => name, "hash_id" => hash_id}) do
     Repo.get_by!(Player, %{hash_id: hash_id, name: name})
