@@ -40,7 +40,7 @@ defmodule FutureButcherApiWeb.GameChannel do
     {:noreply, socket}
   end
 
-  # Client callbacks -----------------------------------------------------------
+  # Client callbacks ===========================================================
 
   def handle_in("get_scores", _payload, socket) do
     reply_success(retrieve_scores(), socket)
