@@ -109,6 +109,8 @@ defmodule FutureButcherApiWeb.GameChannel do
   end
 
   def handle_in("pay_mugger", %{"response" => response}, socket) do
+    response = String.to_existing_atom(response)
+
     case Game.pay_mugger(via(socket.topic), response) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
@@ -143,8 +145,10 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   # Weapons/items --------------------------------------------------------------
 
-  def handle_in("buy_pack", %{"pack_space" => pack_space, "cost" => cost}, socket) do
-    case Game.buy_pack(via(socket.topic), format_integer(pack_space), format_integer(cost)) do
+  def handle_in("buy_pack", %{"pack" => pack}, socket) do
+    pack = String.to_existing_atom(pack)
+
+    case Game.buy_pack(via(socket.topic), pack) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
       error             -> reply_failure(error, socket)
@@ -152,6 +156,8 @@ defmodule FutureButcherApiWeb.GameChannel do
   end
 
   def handle_in("buy_weapon", %{"weapon" => weapon}, socket) do
+    weapon = String.to_existing_atom(weapon)
+
     case Game.buy_weapon(via(socket.topic), weapon) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
@@ -160,6 +166,8 @@ defmodule FutureButcherApiWeb.GameChannel do
   end
 
   def handle_in("replace_weapom", %{"weapon" => weapon}, socket) do
+    weapon = String.to_existing_atom(weapon)
+
     case Game.replace_weapon(via(socket.topic), weapon) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
