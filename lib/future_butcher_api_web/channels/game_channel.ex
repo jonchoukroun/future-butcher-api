@@ -165,7 +165,7 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def handle_in("replace_weapom", %{"weapon" => weapon}, socket) do
+  def handle_in("replace_weapon", %{"weapon" => weapon}, socket) do
     weapon = String.to_existing_atom(weapon)
 
     case Game.replace_weapon(via(socket.topic), weapon) do
