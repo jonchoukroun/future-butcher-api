@@ -6,6 +6,7 @@ defmodule FutureButcherApiWeb.GameChannel do
   alias FutureButcherApi.{Repo, Player, Score}
   alias FutureButcherApiWeb.Presence
 
+
   def join("game:" <> _player, %{"player_name" => name, "hash_id" => hash_id} = payload, socket) do
     if authorized?(socket) do
       send(self(), {:after_join, name})
@@ -39,10 +40,14 @@ defmodule FutureButcherApiWeb.GameChannel do
     {:noreply, socket}
   end
 
-  # Client callbacks
+  # Client callbacks ===========================================================
+
   def handle_in("get_scores", _payload, socket) do
     reply_success(retrieve_scores(), socket)
   end
+
+
+  # Game management ------------------------------------------------------------
 
   def handle_in("new_game", _payload, socket) do
     "game:" <> player = socket.topic
@@ -80,6 +85,9 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
+
+  # Transit --------------------------------------------------------------------
+
   def handle_in("change_station", payload, socket) do
     %{"destination" => destination} = payload
     destination = String.to_existing_atom(destination)
@@ -92,6 +100,27 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
+  def handle_in("fight_mugger", _payload, socket) do
+    case Game.fight_mugger(via(socket.topic)) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
+  def handle_in("pay_mugger", %{"response" => response}, socket) do
+    response = String.to_existing_atom(response)
+
+    case Game.pay_mugger(via(socket.topic), response) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
+
+  # Loans/debt -----------------------------------------------------------------
+
   def handle_in("buy_loan", %{"debt" => debt, "rate" => rate}, socket) do
     debt = format_integer debt
     rate = format_float rate
@@ -102,6 +131,59 @@ defmodule FutureButcherApiWeb.GameChannel do
       error             -> reply_failure(error, socket)
     end
   end
+
+  def handle_in("pay_debt", %{"amount" => amount}, socket) do
+    amount = format_integer amount
+
+    case Game.pay_debt(via(socket.topic), amount) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
+
+  # Weapons/items --------------------------------------------------------------
+
+  def handle_in("buy_pack", %{"pack" => pack}, socket) do
+    pack = String.to_existing_atom(pack)
+
+    case Game.buy_pack(via(socket.topic), pack) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
+  def handle_in("buy_weapon", %{"weapon" => weapon}, socket) do
+    weapon = String.to_existing_atom(weapon)
+
+    case Game.buy_weapon(via(socket.topic), weapon) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
+  def handle_in("replace_weapon", %{"weapon" => weapon}, socket) do
+    weapon = String.to_existing_atom(weapon)
+
+    case Game.replace_weapon(via(socket.topic), weapon) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
+  def handle_in("drop_weapon", _payload, socket) do
+    case Game.drop_weapon(via(socket.topic)) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason}  -> reply_failure(reason, socket)
+      error             -> reply_failure(error, socket)
+    end
+  end
+
+  # Buy/sell cuts --------------------------------------------------------------
 
   def handle_in("buy_cut", payload, socket) do
     %{"cut" => cut, "amount" => amount} = payload
@@ -127,21 +209,31 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def handle_in("pay_debt", %{"amount" => amount}, socket) do
-    amount = format_integer amount
 
-    case Game.pay_debt(via(socket.topic), amount) do
-      {:ok, state_data} -> reply_success(state_data, socket)
-      {:error, reason}  -> reply_failure(reason, socket)
-      error             -> reply_failure(error, socket)
-    end
+  # Validations ----------------------------------------------------------------
+
+  defp number_of_players(socket) do
+    socket
+    |> Presence.list()
+    |> Map.keys()
+    |> length()
   end
+
+  defp authorized?(socket) do
+    number_of_players(socket) == 0
+  end
+
+
+  # Data formatting ------------------------------------------------------------
 
   defp format_integer(int) when is_binary(int), do: String.to_integer(int)
   defp format_integer(int) when is_integer(int), do: int
 
   defp format_float(float) when is_binary(float), do: String.to_float(float)
   defp format_float(float) when is_float(float), do: float
+
+
+  # DB calls -------------------------------------------------------------------
 
   defp retrieve_player(%{"player_name" => name, "hash_id" => hash_id}) do
     Repo.get_by!(Player, %{hash_id: hash_id, name: name})
@@ -176,6 +268,9 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   defp persist_score_if_valid(_payload), do: :ok
 
+
+  # Utilities ------------------------------------------------------------------
+
   defp via("game:" <> player), do: Game.via_tuple(player)
 
   defp reply_success(state_data, socket), do:
@@ -183,16 +278,5 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   defp reply_failure(reason, socket), do:
     {:reply, {:error, %{reason: inspect(reason)}}, socket}
-
-  defp number_of_players(socket) do
-    socket
-    |> Presence.list()
-    |> Map.keys()
-    |> length()
-  end
-
-  defp authorized?(socket) do
-    number_of_players(socket) == 0
-  end
 
 end
