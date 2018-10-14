@@ -108,10 +108,10 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def handle_in("pay_mugger", %{"response" => response}, socket) do
+  def handle_in("bribe_mugger", %{"response" => response}, socket) do
     response = String.to_existing_atom(response)
 
-    case Game.pay_mugger(via(socket.topic), response) do
+    case Game.bribe_mugger(via(socket.topic), response) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
       error             -> reply_failure(error, socket)
