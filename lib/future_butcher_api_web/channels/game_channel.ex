@@ -108,10 +108,8 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def handle_in("pay_mugger", %{"response" => response}, socket) do
-    response = String.to_existing_atom(response)
-
-    case Game.pay_mugger(via(socket.topic), response) do
+  def handle_in("bribe_mugger", _payload, socket) do
+    case Game.bribe_mugger(via(socket.topic)) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
       error             -> reply_failure(error, socket)
@@ -121,21 +119,8 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   # Loans/debt -----------------------------------------------------------------
 
-  def handle_in("buy_loan", %{"debt" => debt, "rate" => rate}, socket) do
-    debt = format_integer debt
-    rate = format_float rate
-
-    case Game.buy_loan(via(socket.topic), debt, rate) do
-      {:ok, state_data} -> reply_success(state_data, socket)
-      {:error, reason}  -> reply_failure(reason, socket)
-      error             -> reply_failure(error, socket)
-    end
-  end
-
-  def handle_in("pay_debt", %{"amount" => amount}, socket) do
-    amount = format_integer amount
-
-    case Game.pay_debt(via(socket.topic), amount) do
+  def handle_in("pay_debt", _payload, socket) do
+    case Game.pay_debt(via(socket.topic)) do
       {:ok, state_data} -> reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
       error             -> reply_failure(error, socket)
@@ -228,9 +213,6 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   defp format_integer(int) when is_binary(int), do: String.to_integer(int)
   defp format_integer(int) when is_integer(int), do: int
-
-  defp format_float(float) when is_binary(float), do: String.to_float(float)
-  defp format_float(float) when is_float(float), do: float
 
 
   # DB calls -------------------------------------------------------------------
