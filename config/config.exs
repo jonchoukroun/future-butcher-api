@@ -14,6 +14,8 @@ config :future_butcher_api, FutureButcherInterface.Repo,
 config :future_butcher_api,
   ecto_repos: [FutureButcherApi.Repo]
 
+config :phoenix, :json_library, Jason
+
 # Configures the endpoint
 config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   url: [host: "localhost"],
