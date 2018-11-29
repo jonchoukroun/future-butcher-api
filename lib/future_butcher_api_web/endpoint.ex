@@ -1,7 +1,8 @@
 defmodule FutureButcherApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :future_butcher_api
 
-  socket "/socket", FutureButcherApiWeb.UserSocket
+  socket "/socket", FutureButcherApiWeb.UserSocket,
+    websocket: true
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -22,7 +23,7 @@ defmodule FutureButcherApiWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Poison
+    json_decoder: Jason
 
   plug Plug.MethodOverride
   plug Plug.Head
