@@ -1,15 +1,3 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     FutureButcherApi.Repo.insert!(%FutureButcherApi.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
-
 defmodule FutureButcherApi.Seeder do
   alias FutureButcherApi.{Player, Score, Repo}
   import Faker
@@ -23,7 +11,7 @@ defmodule FutureButcherApi.Seeder do
     Repo.insert! %Player{
       name:    name,
       email:   Faker.Internet.email(),
-      hash_id: Enum.join([name, Ecto.DateTime.utc], "%%")
+      hash_id: Enum.join([name, DateTime.utc_now()], "%%")
     }
   end
 
@@ -36,5 +24,5 @@ defmodule FutureButcherApi.Seeder do
 
 end
 
-(1..25) |> Enum.each fn _ -> FutureButcherApi.Seeder.insert_player end
-(1..200) |> Enum.each fn _ -> FutureButcherApi.Seeder.insert_score end
+(1..25) |> Enum.each(fn _ -> FutureButcherApi.Seeder.insert_player end)
+(1..200) |> Enum.each(fn _ -> FutureButcherApi.Seeder.insert_score end)
