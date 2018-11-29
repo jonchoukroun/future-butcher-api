@@ -24,7 +24,7 @@ defmodule FutureButcherApi.Mixfile do
   def application do
     [
       mod: {FutureButcherApi.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :phoenix_ecto]
     ]
   end
 
@@ -44,10 +44,10 @@ defmodule FutureButcherApi.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
+      {:plug, "~> 1.7"},
+      {:jason, "~> 1.0"},
       {:cors_plug, "~> 1.5"},
-      {:cipher, ">= 1.3.4"},
       {:faker, "~> 0.10.0"},
       {:pid_file, "~> 0.1.1"},
       {:future_butcher_engine, in_umbrella: true}
@@ -64,7 +64,7 @@ defmodule FutureButcherApi.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.create --quiet", "ecto.migrate", "test"]
     ]
   end
 end

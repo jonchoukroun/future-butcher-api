@@ -6,7 +6,6 @@ defmodule FutureButcherApiWeb.GameChannel do
   alias FutureButcherApi.{Repo, Player, Score}
   alias FutureButcherApiWeb.Presence
 
-
   def join("game:" <> _player, %{"player_name" => name, "hash_id" => hash_id} = payload, socket) do
     if authorized?(socket) do
       send(self(), {:after_join, name})
@@ -227,8 +226,7 @@ defmodule FutureButcherApiWeb.GameChannel do
   end
 
   defp generate_player_hash(name) when is_binary(name) do
-    Enum.join([name, Ecto.DateTime.utc], "%%")
-    |> Cipher.encrypt
+    Enum.join([name, DateTime.utc_now()], "%%")
   end
 
   defp retrieve_scores(), do: retrieve_scores(100)

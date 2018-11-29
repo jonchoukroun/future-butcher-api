@@ -1,5 +1,7 @@
 defmodule FutureButcherApi.Repo do
-  use Ecto.Repo, otp_app: :future_butcher_api
+  use Ecto.Repo,
+    otp_app: :future_butcher_api,
+    adapter: Ecto.Adapters.Postgres
 
   @doc """
   Dynamically loads the repository url from the
