@@ -3,7 +3,7 @@ use Mix.Config
 config :logger, level: :info
 
 config :future_butcher_api, FutureButcherApiWeb.Endpoint,
-  secret_key_base: "3kqea5Qnw44Coi021eZTY7Ts+xx0iFpAUzhzuEMymI7o8ZzaBUEWwaYb2GLabffH",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   url: [host: System.get_env("HOSTNAME")],
   http: [port: 8888],
   https: [
