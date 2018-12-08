@@ -20,7 +20,7 @@ defmodule FutureButcherApi.Mixfile do
   def application do
     [
       mod: {FutureButcherApi.Application, []},
-      extra_applications: [:logger, :runtime_tools, :phoenix_ecto]
+      extra_applications: [:logger, :runtime_tools, :phoenix_ecto, :edeliver]
     ]
   end
 
@@ -45,7 +45,9 @@ defmodule FutureButcherApi.Mixfile do
       {:jason, "~> 1.0"},
       {:cors_plug, "~> 1.5"},
       {:faker, "~> 0.10.0"},
-      {:future_butcher_engine, "~> 0.1.0"}
+      {:future_butcher_engine, "~> 0.1.0"},
+      {:distillery, "~> 2.0", warn_missing: false},
+      {:edeliver, ">= 1.6.0"}
     ]
   end
 
