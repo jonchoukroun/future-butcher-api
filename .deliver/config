@@ -6,7 +6,7 @@ BUILD_HOST="futurebutcher.com"
 BUILD_USER="deploy"
 BUILD_AT="/tmp/edeliver/$APP/builds"
 
-START_DEPLOY=true
+START_DEPLOY=false
 CLEAN_DEPLOY=true
 
 # prevent re-installing node modules; this defaults to "."
