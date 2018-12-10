@@ -1,5 +1,6 @@
 defmodule FutureButcherApiWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :future_butcher_api
+  use Sentry.Phoenix.Endpoint
 
   socket "/socket", FutureButcherApiWeb.UserSocket,
     websocket: true
