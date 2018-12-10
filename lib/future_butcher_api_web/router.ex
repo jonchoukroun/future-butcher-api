@@ -1,7 +1,7 @@
 defmodule FutureButcherApiWeb.Router do
   use FutureButcherApiWeb, :router
   use Plug.ErrorHandler
-  user Sentry.Plug
+  use Sentry.Plug
 
   pipeline :api do
     plug :accepts, ["json"]
