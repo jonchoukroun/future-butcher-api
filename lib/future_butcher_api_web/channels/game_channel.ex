@@ -13,7 +13,9 @@ defmodule FutureButcherApiWeb.GameChannel do
       retrieve_player(payload)
       {:ok, %{hash_id: hash_id}, socket}
     else
-      {:error, %{reason: "Unauthorized"}}
+      msg = "Unauthorized"
+      Sentry.capture_message(msg, extra: %{payload: payload})
+      {:error, %{reason: msg}}
     end
   end
 
@@ -24,12 +26,16 @@ defmodule FutureButcherApiWeb.GameChannel do
       player = persist_player(payload)
       {:ok, %{hash_id: player.hash_id}, socket}
     else
-      {:error, %{reason: "Unauthorized"}}
+      msg = "Unauthorized"
+      Sentry.capture_message(msg, extra: %{payload: payload})
+      {:error, %{reason: msg}}
     end
   end
 
-  def join("game:" <> _player, _payload) do
-    {:error, %{reason: "Invalid payload"}}
+    def join("game:" <> _player, _payload) do
+    msg = "Invalid payload"
+    Sentry.capture_message(msg)
+    {:error, %{reason: msg}}
   end
 
   def handle_info({:after_join, screen_name}, socket) do
@@ -256,7 +262,10 @@ defmodule FutureButcherApiWeb.GameChannel do
   defp reply_success(state_data, socket), do:
     {:reply, {:ok, %{state_data: state_data}}, socket}
 
-  defp reply_failure(reason, socket), do:
+  defp reply_failure(reason, socket) do
+    Sentry.capture_message(reason)
+    
     {:reply, {:error, %{reason: inspect(reason)}}, socket}
+  end
 
 end
