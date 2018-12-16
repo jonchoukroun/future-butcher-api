@@ -14,7 +14,7 @@ defmodule FutureButcherApiWeb.GameChannel do
       {:ok, %{hash_id: hash_id}, socket}
     else
       msg = "Unauthorized"
-      Sentry.capture_message("Failed to re-join socket", extra %{extra: msg})
+      Sentry.capture_message("Failed to re-join socket", extra: %{extra: msg})
       {:error, %{reason: msg}}
     end
   end
@@ -27,14 +27,14 @@ defmodule FutureButcherApiWeb.GameChannel do
       {:ok, %{hash_id: player.hash_id}, socket}
     else
       msg = "Unauthorized"
-      Sentry.capture_message("Failed to join socket", extra %{extra: msg})
+      Sentry.capture_message("Failed to join socket", extra: %{extra: msg})
       {:error, %{reason: msg}}
     end
   end
 
   def join("game:" <> _player, _payload) do
     msg = "Invalid payload"
-    Sentry.capture_message("Failed to join game", extra %{extra: msg})
+    Sentry.capture_message("Failed to join game", extra: %{extra: msg})
     {:error, %{reason: msg}}
   end
 
