@@ -48,7 +48,8 @@ defmodule FutureButcherApi.Mixfile do
       {:future_butcher_engine, "~> 0.1.0"},
       {:distillery, "~> 2.0", warn_missing: false},
       {:edeliver, ">= 1.6.0"},
-      {:sentry, "~> 7.0"}
+      {:sentry, "~> 7.0"},
+      {:cipher, ">= 1.4.0"}
     ]
   end
 
