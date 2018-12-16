@@ -17,3 +17,8 @@ config :future_butcher_api, FutureButcherApi.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
+
+config :cipher,
+  keyphrase: "thisisthekeyphrase",
+  ivphrase: "thisistheivphrase",
+  magic_token: "magictoken"
