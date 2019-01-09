@@ -1,7 +1,6 @@
 defmodule FutureButcherApiWeb.GameChannel do
   use FutureButcherApiWeb, :channel
   import Ecto.Query
-
   alias FutureButcherEngine.{Game, GameSupervisor}
   alias FutureButcherApi.{Repo, Player, Score}
   alias FutureButcherApiWeb.Presence
