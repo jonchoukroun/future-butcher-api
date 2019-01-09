@@ -232,7 +232,8 @@ defmodule FutureButcherApiWeb.GameChannel do
   end
 
   defp generate_player_hash(name) when is_binary(name) do
-    Enum.join([name, DateTime.utc_now()], "%%")
+    raw = Enum.join([name, DateTime.utc_now()], "%%")
+    :crypto.hash(:sha256, raw) |> Base.encode64
   end
 
   defp retrieve_scores(), do: retrieve_scores(100)
