@@ -38,6 +38,7 @@ defmodule FutureButcherApi.Mixfile do
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
+      {:bcrypt_elixir, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
       {:plug_cowboy, "~> 2.0"},
@@ -45,7 +46,7 @@ defmodule FutureButcherApi.Mixfile do
       {:jason, "~> 1.0"},
       {:cors_plug, "~> 1.5"},
       {:faker, "~> 0.10.0"},
-      {:future_butcher_engine, "~> 0.1.0"},
+      {:future_butcher_engine, "~> 0.1.2"},
       {:distillery, "~> 2.0", warn_missing: false},
       {:edeliver, ">= 1.6.0"},
       {:sentry, "~> 7.0"}
