@@ -2,10 +2,10 @@ defmodule FutureButcherApiWeb.GameChannel do
   use FutureButcherApiWeb, :channel
   import Ecto.Query
   alias FutureButcherEngine.{Game, GameSupervisor}
-  alias FutureButcherApi.{Repo, Player, Score}
+  alias FutureButcherApi.{Auth, Score, Repo}
   alias FutureButcherApiWeb.Presence
 
-  def join("game:" <> _player, %{"player_name" => name, "hash_id" => hash_id} = payload, socket) do
+  def join("game:" <> _player, %{"name" => name, "hash_id" => hash_id} = payload, socket) do
     if authorized?(socket) do
       send(self(), {:after_join, name})
 
@@ -18,7 +18,7 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def join("game:" <> _player, %{"player_name" => name} = payload, socket) do
+  def join("game:" <> _player, %{"name" => name} = payload, socket) do
     if authorized?(socket) do
       send(self(), {:after_join, name})
 
@@ -221,18 +221,11 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   # DB calls -------------------------------------------------------------------
 
-  defp retrieve_player(%{"player_name" => name, "hash_id" => hash_id}) do
-    Repo.get_by!(Player, %{hash_id: hash_id, name: name})
-  end
+  defp retrieve_player(player_id) when is_nil(player_id) or not is_integer(player_id), do: {:error, :invalid_player_id}
+  defp retrieve_player(player_id), do: Auth.get_player!(player_id)
 
-  defp persist_player(%{"player_name" => name}) do
-    hash_id = generate_player_hash(name)
-    Repo.insert!(%Player{name: name, hash_id: hash_id})
-  end
-
-  defp generate_player_hash(name) when is_binary(name) do
-    raw = Enum.join([name, DateTime.utc_now()], "%%")
-    :crypto.hash(:sha256, raw) |> Base.encode64
+  defp persist_player(%{"name" => name, "email" => email, "password" => password}) do
+    Auth.create_player(%{"name" => name, "email" => email, "password" => password})
   end
 
   defp retrieve_scores(), do: retrieve_scores(100)
