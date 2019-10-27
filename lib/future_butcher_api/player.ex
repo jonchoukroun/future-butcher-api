@@ -6,8 +6,9 @@ defmodule FutureButcherApi.Player do
 
   schema "players" do
     field :email, :string
-    field :hash_id, :string
     field :name, :string
+    field :password, :string, virtual: true
+    field :password_hash, :string
 
     has_many :scores, Score
 
@@ -17,10 +18,18 @@ defmodule FutureButcherApi.Player do
   @doc false
   def changeset(player, attrs) do
     player
-    |> cast(attrs, [:name, :email])
+    |> cast(attrs, [:name, :email, :password])
+    |> validate_required([:name, :email, :password])
     |> unique_constraint(:hash_id)
     |> unique_constraint(:email)
-    |> validate_required([:name])
     |> validate_format(:email, ~r/@/)
+    |> validate_length(:password, min: 6)
+    |> put_password_hash()
   end
+
+  defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
+    change(changeset, password_hash: Bcrypt.hash_pwd_salt(password))
+  end
+
+  defp put_password_hash(changeset), do: changeset
 end
