@@ -1,5 +1,7 @@
 import Config
 
+ssl_cert_path = System.fetch_env!("SSL_CERT_PATH")
+
 config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   secret_key_base: System.fetch_env!("SECRET_KEY_BASE"),
   http: [port: String.to_integer(System.fetch_env!("APP_PORT"))],
@@ -7,8 +9,8 @@ config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   https: [
     port: 443,
     otp_app: :future_butcher_api,
-    keyfile: System.fetch_env!("SSL_KEYFILE_PATH"),
-    certfile: System.fetch_env!("SSL_CERTFILE_PATH")
+    keyfile: Path.expand("#{ssl_cert_path}selfsigned_key.pem")
+    certfile: Path.expand("#{ssl_cert_path}selfsigned.pem")
   ],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   check_origin: false,
