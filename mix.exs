@@ -20,7 +20,7 @@ defmodule FutureButcherApi.Mixfile do
   def application do
     [
       mod: {FutureButcherApi.Application, []},
-      extra_applications: [:logger, :runtime_tools, :phoenix_ecto, :edeliver]
+      extra_applications: [:logger, :runtime_tools, :phoenix_ecto]
     ]
   end
 
