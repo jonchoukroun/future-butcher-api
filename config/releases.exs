@@ -4,10 +4,10 @@ ssl_cert_path = System.fetch_env!("SSL_CERT_PATH")
 
 config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   secret_key_base: System.fetch_env!("SECRET_KEY_BASE"),
-  http: [port: String.to_integer(System.fetch_env!("APP_PORT"))],
+  http: [port: 8888)],
   url: [host: "futurebutcher.com"],
   https: [
-    port: 443,
+    port: String.to_integer(System.fetch_env!("APP_PORT")),
     keyfile: Path.absname("#{ssl_cert_path}privkey.pem"),
     certfile: Path.absname("#{ssl_cert_path}fullchain.pem")
   ],
