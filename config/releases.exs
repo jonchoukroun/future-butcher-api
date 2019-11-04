@@ -9,8 +9,8 @@ config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   https: [
     port: 443,
     otp_app: :future_butcher_api,
-    keyfile: Path.expand("#{ssl_cert_path}selfsigned_key.pem"),
-    certfile: Path.expand("#{ssl_cert_path}selfsigned.pem")
+    keyfile: Path.expand("#{ssl_cert_path}privkey.pem"),
+    certfile: Path.expand("#{ssl_cert_path}fullchain.pem")
   ],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   check_origin: false,
