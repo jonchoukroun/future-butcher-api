@@ -9,7 +9,7 @@ config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   https: [
     port: 443,
     otp_app: :future_butcher_api,
-    keyfile: Path.expand("#{ssl_cert_path}selfsigned_key.pem")
+    keyfile: Path.expand("#{ssl_cert_path}selfsigned_key.pem"),
     certfile: Path.expand("#{ssl_cert_path}selfsigned.pem")
   ],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
@@ -20,8 +20,7 @@ config :future_butcher_api, FutureButcherApi.Repo,
   username: System.fetch_env!("DATABASE_USER"),
   password: System.fetch_env!("DATABASE_PASSWORD"),
   database: System.fetch_env!("DATABASE_NAME"),
-  socket_dir: System.fetch_env!("DATABASE_SOCKET_DIR"),
-  pool_size: System.fetch_env!("DATABASE_POOL_SIZE")
+  pool_size: 15
 
 config :sentry,
   dsn: System.fetch_env!("SENTRY_DSN_KEY"),
