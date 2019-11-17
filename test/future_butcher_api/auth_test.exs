@@ -22,14 +22,25 @@ defmodule FutureButcherApi.AuthTest do
     end
 
     test "list_players/0 returns all players" do
-      player = player_fixture()
-      assert Auth.list_players() == [player]
+      assert Enum.count(Auth.list_players()) === 0
+
+      player_fixture()
+      fetched_players = Auth.list_players()
+
+      assert Enum.count(fetched_players) === 1
+      assert List.first(fetched_players).name === @valid_attrs.name
+      refute is_nil(List.first(fetched_players).password_hash)
     end
 
     test "get_player!/1 returns the player with given id" do
       player = player_fixture()
-      assert Auth.get_player!(player.id) == player
-      assert Ecto.assoc_loaded?(player.scores)
+      fetched_player = Auth.get_player!(player.id)
+      assert player.id === fetched_player.id
+      assert player.name === fetched_player.name
+      refute is_nil(fetched_player.password_hash)
+      assert is_nil(fetched_player.password)
+      assert is_nil(fetched_player.password_confirmation)
+      assert Ecto.assoc_loaded?(fetched_player.scores)
     end
 
     test "create_player/1 with valid data creates a player" do
