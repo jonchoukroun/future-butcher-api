@@ -43,6 +43,7 @@ defmodule FutureButcherApi.Mixfile do
       {:plug_cowboy, "~> 2.0"},
       {:plug, "~> 1.7"},
       {:argon2_elixir, "~> 2.0"},
+      {:guardian, "~> 2.0"},
       {:jason, "~> 1.0"},
       {:cors_plug, "~> 1.5"},
       {:faker, "~> 0.10.0"},
