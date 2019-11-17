@@ -10,6 +10,6 @@ defmodule FutureButcherApiWeb.Router do
   scope "/api/v1", FutureButcherApiWeb do
     pipe_through :api
 
-    resources "/players", PlayerController, only: [:create]
+    resources "/sign_up", PlayerController, only: [:create]
   end
 end
