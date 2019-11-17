@@ -17,3 +17,7 @@ config :future_butcher_api, FutureButcherApi.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
+
+config :argon2_elixir,
+  t_cost: 1,
+  m_cost: 8
