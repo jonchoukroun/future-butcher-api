@@ -1,6 +1,5 @@
-defmodule FutureButcherApiWeb.PlayerView do
+defmodule FutureButcherApiWeb.Auth.RegistrationView do
   use FutureButcherApiWeb, :view
-  alias FutureButcherApiWeb.PlayerView
 
   def render("jwt.json", %{jwt: jwt}), do: %{jwt: jwt}
 end

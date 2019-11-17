@@ -1,4 +1,4 @@
-defmodule FutureButcherApiWeb.PlayerController do
+defmodule FutureButcherApiWeb.Auth.RegistrationController do
   use FutureButcherApiWeb, :controller
 
   alias FutureButcherApi.{Auth, Player, Guardian}
