@@ -7,7 +7,9 @@ defmodule FutureButcherApiWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", FutureButcherApiWeb do
+  scope "/api/v1", FutureButcherApiWeb do
     pipe_through :api
+
+    resources "/players", PlayerController, only: [:create]
   end
 end
