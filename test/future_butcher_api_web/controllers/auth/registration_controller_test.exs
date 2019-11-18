@@ -12,11 +12,6 @@ defmodule FutureButcherApiWeb.Auth.RegistrationControllerTest do
   }
   @invalid_attrs %{}
 
-  def fixture(:player) do
-    {:ok, player} = Auth.create_player(@create_attrs)
-    player
-  end
-
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
