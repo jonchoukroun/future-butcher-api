@@ -1,4 +1,4 @@
-defmodule FutureButcherApiWeb.Auth.RegistrationController do
+defmodule FutureButcherApiWeb.Auth.PlayerController do
   use FutureButcherApiWeb, :controller
 
   alias FutureButcherApi.{Auth, Player, Guardian}
@@ -13,5 +13,12 @@ defmodule FutureButcherApiWeb.Auth.RegistrationController do
       |> put_status(:created)
       |> render("jwt.json", %{jwt: token})
     end
+  end
+
+  @spec show(Plug.Conn.t(), any) :: Plug.Conn.t()
+  def show(conn, _params) do
+    player = Guardian.Plug.current_resource(conn)
+    conn
+    |> render("player.json", player: player)
   end
 end
