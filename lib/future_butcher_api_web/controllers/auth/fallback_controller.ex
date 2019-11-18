@@ -8,4 +8,10 @@ defmodule FutureButcherApiWeb.Auth.FallbackController do
     |> put_status(:unprocessable_entity)
     |> json(%{errors: errors})
   end
+
+  def call(conn, {:error, :unauthorized}) do
+    conn
+    |> put_status(:unauthorized)
+    |> json(%{errors: "Login error"})
+  end
 end
