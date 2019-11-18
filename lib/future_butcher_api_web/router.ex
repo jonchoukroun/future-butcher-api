@@ -11,5 +11,7 @@ defmodule FutureButcherApiWeb.Router do
     pipe_through :api
 
     resources "/sign_up", Auth.RegistrationController, only: [:create]
+
+    post "/sign_in", Auth.SessionsController, :create
   end
 end
