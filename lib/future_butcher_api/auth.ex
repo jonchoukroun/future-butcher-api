@@ -74,6 +74,11 @@ defmodule FutureButcherApi.Auth do
   @spec delete_player(player()) :: {:ok, player()} | {:error, :atom}
   def delete_player(%Player{} = player), do: Repo.delete(player)
 
+  @doc """
+  Verifies a user's name and password and returns a JWT.
+
+  Returns an error if either the user is not found by name, or the password is incorrect.
+  """
   @spec token_sign_in(String.t(), String.t()) :: String.t() | {:error, :unauthorized}
   def token_sign_in(name, password) do
     case name_password_auth(name, password) do
@@ -85,33 +90,23 @@ defmodule FutureButcherApi.Auth do
     end
   end
 
+  defp name_password_auth(name, password) when is_binary(name) and is_binary(password) do
+    with {:ok, player} <- get_by_name(name) do
+      Argon2.check_pass(player, password)
+    end
+  end
+  defp name_password_auth(_name, _password), do: {:error, :invalid_credentials}
+
   defp get_by_name(name) when is_binary(name) do
     Player
     |> preload([:scores])
     |> Repo.get_by(name: name)
     |> case do
       nil ->
-        Comeonin.Argon2.dummy_checkpw()
+        Argon2.no_user_verify()
         {:error, "Login error."}
       player ->
         {:ok, player}
     end
   end
-  defp get_by_name(_), do: {:error, :invalid_credentials}
-
-  defp verify_password(password, %Player{} = player) when is_binary(password) do
-    if Argon2.check_pass(player, password) do
-      {:ok, player}
-    else
-      {:error, :invalid_password}
-    end
-  end
-  defp verify_password(_password), do: {:error, :invalid_password}
-
-  defp name_password_auth(name, password) when is_binary(name) and is_binary(password) do
-    with {:ok, player} <- get_by_name(name) do
-      verify_password(password, player)
-    end
-  end
-  defp name_password_auth(_name, _password), do: {:error, :invalid_credentials}
 end
