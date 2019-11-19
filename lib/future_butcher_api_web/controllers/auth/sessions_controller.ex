@@ -13,4 +13,13 @@ defmodule FutureButcherApiWeb.Auth.SessionsController do
       |> render("jwt.json", jwt: token)
     end
   end
+
+  def delete(conn, _params) do
+    with ["bearer" <> token] <- get_req_header(conn, "authorization"),
+         {:ok, _claims} <- FutureButcherApi.Guardian.revoke(token) do
+      conn
+      |> put_status(:no_content)
+      |> json(%{})
+    end
+  end
 end
