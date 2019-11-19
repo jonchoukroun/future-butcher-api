@@ -2,7 +2,6 @@ defmodule FutureButcherApiWeb.Auth.PlayerControllerTest do
   use FutureButcherApiWeb.ConnCase
 
   alias FutureButcherApi.Auth
-  alias FutureButcherApiWeb.Router.Helpers, as: Routes
 
   @create_attrs %{
     name: "jon",
@@ -26,16 +25,20 @@ defmodule FutureButcherApiWeb.Auth.PlayerControllerTest do
   end
 
   describe "create player" do
-    test "renders player when data is valid", %{conn: conn} do
+    test "renders player when data is valid" do
       assert Enum.count(Auth.list_players()) === 0
 
-      conn = post(conn, Routes.player_path(conn, :create), player: @create_attrs)
+      conn = json_conn()
+      |> post("/api/v1/sign_up", player: @create_attrs)
+
       assert json_response(conn, 201)["jwt"]
       assert Enum.count(Auth.list_players()) === 1
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.player_path(conn, :create), player: @invalid_attrs)
+    test "renders errors when data is invalid" do
+      conn = json_conn()
+      |> post("/api/v1/sign_up", player: @invalid_attrs)
+
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -44,8 +47,7 @@ defmodule FutureButcherApiWeb.Auth.PlayerControllerTest do
     setup [:create_player]
 
     test "returns unauthorized error" do
-      conn = build_conn()
-      |> put_resp_content_type("application/json")
+      conn = json_conn()
       |> get("/api/v1/current_player")
 
       assert json_response(conn, :unauthorized)["error"] === "unauthenticated"
@@ -56,9 +58,8 @@ defmodule FutureButcherApiWeb.Auth.PlayerControllerTest do
     setup [:create_player, :sign_in_player]
 
     test "returns player struct", %{jwt: jwt} do
-      conn = build_conn()
-      |> put_resp_content_type("application/json")
-      |> put_req_header("authorization", "Bearer #{jwt}")
+      conn = json_conn()
+      |> put_req_header("authorization", "bearer " <> jwt)
       |> get("/api/v1/current_player")
 
       assert json_response(conn, :ok)["data"] === %{
@@ -67,6 +68,11 @@ defmodule FutureButcherApiWeb.Auth.PlayerControllerTest do
         "scores" => []
       }
     end
+  end
+
+  defp json_conn do
+    build_conn()
+    |> put_resp_content_type("application/json")
   end
 
   defp create_player(_) do
