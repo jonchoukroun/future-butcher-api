@@ -3,6 +3,7 @@ defmodule FutureButcherApi.Player do
   import Ecto.Changeset
   alias FutureButcherApi.Score
 
+  @derive {Jason.Encoder, only: [:name, :email, :scores]}
 
   schema "players" do
     field :email, :string
