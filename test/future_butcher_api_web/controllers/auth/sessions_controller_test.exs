@@ -78,7 +78,7 @@ defmodule FutureButcherApiWeb.Auth.SessionsControllerTest do
       {:ok, token, _claims} = encode_and_sign(player, %{}, token_type: :access)
 
       conn = json_conn()
-      |> put_req_header("authorization", "bearer " <> token)
+      |> put_req_header("authorization", "Bearer " <> token)
       |> delete("/api/v1/sign_out")
 
       assert json_response(conn, :no_content)
