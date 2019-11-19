@@ -19,6 +19,6 @@ defmodule FutureButcherApiWeb.Auth.PlayerController do
   def show(conn, _params) do
     player = Guardian.Plug.current_resource(conn)
     conn
-    |> render("player.json", player: player)
+    |> json(%{data: player})
   end
 end
