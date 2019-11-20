@@ -51,6 +51,11 @@ defmodule FutureButcherApi.AuthTest do
       assert {:error, %Ecto.Changeset{}} = Auth.create_player(@invalid_attrs)
     end
 
+    test "create_player/1 with same name as existing player returns error changeset" do
+      player_fixture()
+      assert {:error, %Ecto.Changeset{}} = Auth.create_player(@valid_attrs)
+    end
+
     test "delete_player/1 deletes the player" do
       player = player_fixture()
       assert {:ok, %Player{}} = Auth.delete_player(player)
