@@ -21,8 +21,8 @@ defmodule FutureButcherApiWeb do
     quote do
       use Phoenix.Controller, namespace: FutureButcherApiWeb
       import Plug.Conn
-      import FutureButcherApiWeb.Router.Helpers
       import FutureButcherApiWeb.Gettext
+      alias FutureButcherApiWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -34,7 +34,7 @@ defmodule FutureButcherApiWeb do
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
 
-      import FutureButcherApiWeb.Router.Helpers
+      alias FutureButcherApiWeb.Router.Helpers, as: Routes
       import FutureButcherApiWeb.ErrorHelpers
       import FutureButcherApiWeb.Gettext
     end

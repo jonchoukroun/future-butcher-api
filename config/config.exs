@@ -24,6 +24,17 @@ config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   pubsub: [name: FutureButcherApi.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
+config :argon2_elixir,
+  t_cost: 4,
+  m_cost: 10,
+  parallelism: 2,
+  argon2_type: 2
+
+config :future_butcher_api, FutureButcherApi.Guardian,
+  issuer: "future_butcher_api",
+  secret_key: "tBbCeaFB/P9wTxNYYYn9jl9/Ki4dGA6Yxy3mS6DFX57lDQ3ioMZpMlBKhbtqxTVc"
+
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

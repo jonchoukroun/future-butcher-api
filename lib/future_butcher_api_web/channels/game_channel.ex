@@ -221,19 +221,18 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   # DB calls -------------------------------------------------------------------
 
-  defp retrieve_player(%{"player_name" => name, "hash_id" => hash_id}) do
-    Repo.get_by!(Player, %{hash_id: hash_id, name: name})
+  defp retrieve_player(%{"player_name" => name}) do
+    Repo.get_by!(Player, %{name: name})
   end
 
   defp persist_player(%{"player_name" => name}) do
-    hash_id = generate_player_hash(name)
-    Repo.insert!(%Player{name: name, hash_id: hash_id})
+    Repo.insert!(%Player{name: name})
   end
 
-  defp generate_player_hash(name) when is_binary(name) do
-    raw = Enum.join([name, DateTime.utc_now()], "%%")
-    :crypto.hash(:sha256, raw) |> Base.encode64
-  end
+  # defp generate_player_hash(name) when is_binary(name) do
+  #   raw = Enum.join([name, DateTime.utc_now()], "%%")
+  #   :crypto.hash(:sha256, raw) |> Base.encode64
+  # end
 
   defp retrieve_scores(), do: retrieve_scores(100)
 
