@@ -39,10 +39,10 @@ jobs:
       - save_cache:
           key: v1-mix-cache
           paths: "deps"
-      - save_cache
+      - save_cache:
           key: v1-build-cache-{{ .Branch }}
           paths: "_build"
-      - save_cache
+      - save_cache:
           key: v1-build-cache
           paths: "_build"
 
