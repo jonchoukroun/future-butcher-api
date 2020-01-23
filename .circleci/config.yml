@@ -59,7 +59,7 @@ jobs:
       - <<: *install_mix_deps
       - <<: *get_and_compile_deps
       - <<: *wait_for_db
-      - <<: test
+      - <<: *test
       - store_test_results:
         path: /tmp/circleci-test-results
 
