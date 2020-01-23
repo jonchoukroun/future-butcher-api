@@ -1,56 +1,73 @@
 version: 2
+
+# Docker -----------------------------------------------------------------------
+
+docker_tests: &docker_tests
+  docker:
+    - image: circleci/elixir:1.9.2
+    - image: circleci/postgres:10-alpine
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_DB: future_butcher_api_test
+        POSTGRES_PASSWORD: postgres
+
+
+# Build Steps ------------------------------------------------------------------
+
+checkout_code: &checkout_code
+  type: checkout
+  name: Checking out code
+
+install_mix_deps: &install_mix_deps
+  run:
+    name: 'Installing hex and rebar'
+    command: |
+      mix local.hex --force
+      mix local.rebar --force
+
+get_and_compile_deps: &get_and_compile_deps
+  run:
+    name: 'Installing and compiling dependencies'
+    command: |
+      mix deps.get
+      mix deps.compile
+
+wait_for_db: &wait_for_db
+    run:
+      name: 'Waiting for Postgres DB'
+      command: |
+          dockerize -wait tcp://localhost:5432 -timeout 1m
+
+test: &test
+    run:
+      name: 'Run tests'
+      command: |
+        mix test
+
+# Jobs -------------------------------------------------------------------------
+
 jobs:
-  build:
+
+  test:
+    working_directory: ~/future_butcher_api
     parallelism: 1
-    docker:
-      - image: circleci/elixir:1.9.2
-        environment:
-          MIX_ENV: test
-      - image: circleci/postgres:10.1-alpine
-        environment:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: app_test
-          POSTGRES_PASSWORD:
-
-    working_directory: ~/app
-
+    <<: *docker_tests
+    environment:
+      MIX_ENV=test
     steps:
-      - checkout
-
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-
-      - restore_cache:
-          keys:
-            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
-            - v1-mix-cache-{{ .Branch }}
-            - v1-mix-cache
-      - restore_cache:
-          keys:
-            - v1-build-cache-{{ .Branch }}
-            - v1-build-cache
-      - run: mix do deps.get, compile
-      - save_cache:
-          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
-          paths: "deps"
-      - save_cache:
-          key: v1-mix-cache-{{ .Branch }}
-          paths: "deps"
-      - save_cache:
-          key: v1-mix-cache
-          paths: "deps"
-      - save_cache:
-          key: v1-build-cache-{{ .Branch }}
-          paths: "_build"
-      - save_cache:
-          key: v1-build-cache
-          paths: "_build"
-
-      - run:
-          name: Wait for DB
-          command: dockerize -wait tcp://localhost:5432 -timeout 1m
-
-      - run: mix test
-
+      - <<: *checkout_code
+      - <<: *install_mix_deps
+      - <<: *get_and_compile_deps
+      - <<: *wait_for_db
+      - <<: test
       - store_test_results:
-          path: _build/test/lib/future_butcher_api
+        path: /tmp/circleci-test-results
+
+# Workflows --------------------------------------------------------------------
+
+workflows:
+  version: 2
+
+  test:
+    jobs:
+      - test
