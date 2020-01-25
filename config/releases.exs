@@ -9,9 +9,8 @@ config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   https: [
     port: String.to_integer(System.fetch_env!("APP_PORT")),
     keyfile: Path.absname("#{ssl_cert_path}privkey.pem"),
-    certfile: Path.absname("#{ssl_cert_path}cert.pem")
+    certfile: Path.absname("#{ssl_cert_path}fullchain.pem")
   ],
-  force_ssl: [rewrite_on: [:x_forwarded_proto], host: nil],
   check_origin: false,
   server: true
 
