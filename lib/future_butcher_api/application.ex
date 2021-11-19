@@ -10,6 +10,7 @@ defmodule FutureButcherApi.Application do
     children = [
       # Start the Ecto repository
       supervisor(FutureButcherApi.Repo, []),
+      {Phoenix.PubSub, name: FutureButcherApi.PubSub},
       # Start the endpoint when the application starts
       supervisor(FutureButcherApiWeb.Endpoint, []),
       supervisor(FutureButcherApiWeb.Presence, []),
