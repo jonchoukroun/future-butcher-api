@@ -21,8 +21,7 @@ config :future_butcher_api, FutureButcherApiWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "3HY7w2nrfM4XpDMVYTU57/0iqfIlq5q+IydM8jryVNZpMS+XKWSDHWxvKev7eBfS",
   render_errors: [view: FutureButcherApiWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: FutureButcherApi.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub_server: FutureButcherApi.PubSub
 
 # Configures Elixir's Logger
 config :logger, :console,
