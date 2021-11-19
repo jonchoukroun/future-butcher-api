@@ -5,7 +5,7 @@ defmodule FutureButcherApi.Mixfile do
     [
       app: :future_butcher_api,
       version: "0.1.3",
-      elixir: "~> 1.9.2",
+      elixir: "~> 1.12.3",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
       start_permanent: Mix.env == :prod,
@@ -33,19 +33,21 @@ defmodule FutureButcherApi.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.0"},
-      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix, "~> 1.5.0"},
+      {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.0"},
+      {:phoenix_live_view, "~> 0.17.5"},
+      {:floki, ">= 0.30.0", only: :test},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      {:plug_cowboy, "~> 2.0"},
+      {:plug_cowboy, "~> 2.1"},
       {:plug, "~> 1.7"},
       {:jason, "~> 1.0"},
       {:cors_plug, "~> 1.5"},
-      {:faker, "~> 0.10.0"},
-      {:future_butcher_engine, "~> 0.1.2"},
+      {:faker, "~> 0.16"},
+      {:future_butcher_engine, "~> 0.1.3"},
       {:sentry, "~> 7.0"}
     ]
   end
