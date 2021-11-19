@@ -7,6 +7,11 @@ defmodule FutureButcherApiWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :browser do
+    plug :fetch_session
+    plug :fetch_live_flash
+  end
+
   scope "/api", FutureButcherApiWeb do
     pipe_through :api
   end

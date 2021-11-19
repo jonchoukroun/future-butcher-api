@@ -37,6 +37,7 @@ defmodule FutureButcherApiWeb do
       import FutureButcherApiWeb.Router.Helpers
       import FutureButcherApiWeb.ErrorHelpers
       import FutureButcherApiWeb.Gettext
+      import Phoenix.LiveView.Helpers
     end
   end
 
@@ -45,6 +46,7 @@ defmodule FutureButcherApiWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 
