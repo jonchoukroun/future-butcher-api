@@ -10,6 +10,7 @@ defmodule FutureButcherApiWeb.Router do
   pipeline :browser do
     plug :fetch_session
     plug :fetch_live_flash
+    plug :put_root_layout, {FutureButcherApiWeb.LayoutView, :root}
   end
 
   scope "/api", FutureButcherApiWeb do

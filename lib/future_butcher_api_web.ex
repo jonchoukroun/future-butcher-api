@@ -28,16 +28,35 @@ defmodule FutureButcherApiWeb do
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/future_butcher_api_web/templates",
-                        namespace: FutureButcherApiWeb
+      use Phoenix.View,
+        root: "lib/<%= lib_web_name %>/templates",
+        namespace: <%= web_namespace %>
 
       # Import convenience functions from controllers
-      import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
+      import Phoenix.Controller,
+        only: [get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
 
-      import FutureButcherApiWeb.Router.Helpers
+      unquote(view_helpers())
+    end
+  end
+
+  def live_view do
+    quote do
+      use Phoenix.LiveView,
+        layout: {<%= web_namespace %>.LayoutView, "live.html"}
+
+        unquote(view_helpers())
+    end
+  end
+
+  def live_component do
+    quote do
+      use Phoenix.HTML
+      import Phoenix.LiveView.Helpers
+      import Phoenix.View
       import FutureButcherApiWeb.ErrorHelpers
       import FutureButcherApiWeb.Gettext
-      import Phoenix.LiveView.Helpers
+      alias FutureButcherApiWeb.Router.Helpers, as: Routes
     end
   end
 
