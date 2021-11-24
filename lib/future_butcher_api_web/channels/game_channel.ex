@@ -248,16 +248,8 @@ defmodule FutureButcherApiWeb.GameChannel do
   defp persist_score_if_valid(%{"score" => score}) when is_nil(score), do: :ok
 
   defp persist_score_if_valid(%{"score" => score, "hash_id" => hash_id}) do
-    player = Repo.get_by(Player, %{hash_id: hash_id}) |> Repo.preload(:scores)
-    if player.scores && Enum.count(player.scores) > 0 do
-      [high_score | _tail] = player.scores
-      if high_score < score do
-        Repo.get(Score, high_score.id) |> Repo.delete()
-        Repo.insert!(%Score{score: score, player_id: player.id});
-      end
-    else
-      Repo.insert!(%Score{score: score, player_id: player.id});
-    end
+    player = Repo.get_by(Player, %{hash_id: hash_id})
+    Repo.insert!(%Score{score: score, player_id: player.id})
   end
 
   defp persist_score_if_valid(_payload), do: :ok
