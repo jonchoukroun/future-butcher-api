@@ -22,11 +22,4 @@ config :future_butcher_api, FutureButcherApi.Repo,
   pool_size: 15
 
 config :sentry,
-  dsn: System.fetch_env!("SENTRY_DSN_KEY"),
-  environment_name: :prod,
-  enable_source_code_context: true,
-  root_source_code_path: File.cwd!,
-  tags: %{
-    env: "production"
-  },
-  included_environments: [:prod]
+  dsn: System.fetch_env!("SENTRY_DSN_KEY")
