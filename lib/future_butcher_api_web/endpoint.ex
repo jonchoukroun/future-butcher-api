@@ -1,6 +1,6 @@
 defmodule FutureButcherApiWeb.Endpoint do
+  use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :future_butcher_api
-  use Sentry.Phoenix.Endpoint
 
   socket "/socket", FutureButcherApiWeb.UserSocket,
     websocket: true
@@ -25,6 +25,8 @@ defmodule FutureButcherApiWeb.Endpoint do
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Jason
+
+  plug Sentry.PlugContext
 
   plug Plug.MethodOverride
   plug Plug.Head
