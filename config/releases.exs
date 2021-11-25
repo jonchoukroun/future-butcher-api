@@ -30,3 +30,6 @@ config :sentry,
     env: "production"
   },
   included_environments: [:prod]
+
+config :logger, Sentry.LoggerBackend,
+  capture_log_messages: true
