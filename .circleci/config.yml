@@ -8,14 +8,22 @@ jobs:
   build:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    parallelism: 1
     docker:
       # specify the version here
       - image: circleci/elixir:1.12.2
+        environment:
+          MIX_ENV: test
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      - image: circleci/postgres:9.4
+      - image: circleci/postgres:10.19-alpine
+        auth:
+          username: postgres
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: future_butcher_api_dev
 
     working_directory: ~/repo
     # Add steps to the job
@@ -25,7 +33,27 @@ jobs:
 
       # specify any bash command here prefixed with `run: `
       - run: mix local.hex --force
-      - run: mix local.rebar
-      - run: mix deps.get
-      - run: MIX_ENV=test mix ecto.setup
+      - run: mix local.rebar --force
+      - restore_cache:
+        keys:
+          - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          - v1-mix-cache-{{ .Branch }}
+          - v1-mix-cache
+      - restore_cache:
+        keys:
+          - v1-build-cache-{{ .Branch }}
+          - v1-build-cache
+      - run: mix do deps.get, compile
+      - save_cache:
+        key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+        paths: "deps"
+      - save_cache:
+        key: v1-build-cache-{{ .Branch }}
+        paths: "_build"
+      - run:
+        name: Wait for DB
+        command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run: mix ecto.setup
       - run: mix test
+      - store_test_results:
+        path: _build/test/lib/future_butcher_api
