@@ -35,25 +35,25 @@ jobs:
       - run: mix local.hex --force
       - run: mix local.rebar --force
       - restore_cache:
-        keys:
-          - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
-          - v1-mix-cache-{{ .Branch }}
-          - v1-mix-cache
+          keys:
+            - v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+            - v1-mix-cache-{{ .Branch }}
+            - v1-mix-cache
       - restore_cache:
-        keys:
-          - v1-build-cache-{{ .Branch }}
-          - v1-build-cache
+          keys:
+            - v1-build-cache-{{ .Branch }}
+            - v1-build-cache
       - run: mix do deps.get, compile
       - save_cache:
-        key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
-        paths: "deps"
+          key: v1-mix-cache-{{ .Branch }}-{{ checksum "mix.lock" }}
+          paths: "deps"
       - save_cache:
-        key: v1-build-cache-{{ .Branch }}
-        paths: "_build"
+          key: v1-build-cache-{{ .Branch }}
+          paths: "_build"
       - run:
-        name: Wait for DB
-        command: dockerize -wait tcp://localhost:5432 -timeout 1m
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run: mix ecto.setup
       - run: mix test
       - store_test_results:
-        path: _build/test/lib/future_butcher_api
+          path: _build/test/lib/future_butcher_api
