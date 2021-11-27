@@ -24,8 +24,8 @@ jobs:
       - checkout
 
       # specify any bash command here prefixed with `run: `
-      - run: mix deps.get
       - run: mix local.hex --force
-      - run: MIX_ENV=test mix ecto.create
-      - run: mix run priv/repo/seeds.exs
+      - run: mix local.rebar
+      - run: mix deps.get
+      - run: MIX_ENV=test mix ecto.setup
       - run: mix test
