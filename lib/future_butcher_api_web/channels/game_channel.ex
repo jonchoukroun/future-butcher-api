@@ -247,6 +247,8 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   defp persist_score_if_valid(%{"score" => score}) when is_nil(score), do: :ok
 
+  defp persist_score_if_valid(%{"score" => score}) when score == 0, do: :ok
+
   defp persist_score_if_valid(%{"score" => score, "hash_id" => hash_id}) do
     scores = from(s in Score,
       order_by: [desc: :score],

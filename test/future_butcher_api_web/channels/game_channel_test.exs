@@ -98,6 +98,21 @@ defmodule FutureButcherApiWeb.GameChannelTest do
       ref = push(socket, "end_game", %{score: nil, hash_id: player.hash_id})
       assert_reply ref, :ok, %{state_data: _state_data}
 
+      player = Player |> preload(:scores) |> Repo.get(player.id)
+      assert player.scores == []
+
+      cleanup(player)
+    end
+
+    test "does not persist a score of 0", %{socket: socket} do
+      player = create_player(socket)
+
+      ref = push(socket, "end_game", %{score: 0, hash_id: player.hash_id})
+      assert_reply ref, :ok, %{state_data: _state_data}
+
+      player = Player |> preload(:scores) |> Repo.get(player.id)
+      assert player.scores == []
+
       cleanup(player)
     end
 
