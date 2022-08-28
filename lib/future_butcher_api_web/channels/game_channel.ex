@@ -107,6 +107,10 @@ defmodule FutureButcherApiWeb.GameChannel do
   def handle_in("fight_mugger", _payload, socket) do
     case Game.fight_mugger(via(socket.topic)) do
       {:ok, state_data} -> reply_success(state_data, socket)
+      {:game_over, state_data} ->
+        "game:" <> player = socket.topic
+        GameSupervisor.stop_game(player)
+        reply_success(state_data, socket)
       {:error, reason}  -> reply_failure(reason, socket)
       error             -> reply_failure(error, socket)
     end
