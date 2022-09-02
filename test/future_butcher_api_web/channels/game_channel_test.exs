@@ -3,6 +3,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
   import Ecto.Query
   alias FutureButcherApiWeb.{GameChannel, UserSocket}
   alias FutureButcherApi.{Repo, Player, Score}
+  alias FutureButcherEngine.Game
 
   describe "join" do
     test "join succeeds for new player" do
@@ -75,27 +76,54 @@ defmodule FutureButcherApiWeb.GameChannelTest do
       ref = push(socket, "start_game", %{})
       assert_reply ref, :ok
 
-      %{socket: socket}
+      state = :sys.get_state(Game.via_tuple("bob"))
+
+      %{socket: socket, state: state}
     end
 
-    test "does not persist score when lower than player's high score", %{socket: socket} do
-      player = create_player(socket)
-      Repo.insert!(%Score{score: 500, player_id: player.id})
+    test "doesn't persist score with turns left",
+      %{socket: socket, state: state} do
+        player = create_player(socket)
+        %{player: current_player} = state
+        new_player = Map.replace(current_player, :cash, 1000)
+        :sys.replace_state(
+          Game.via_tuple("bob"),
+          fn state -> %{state | player: new_player} end
+        )
 
-      ref = push(socket, "end_game", %{score: 100, hash_id: player.hash_id})
-      assert_reply ref, :ok, %{state_data: _state_data}
+        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        assert_reply ref, :ok, %{state_data: _state_data}
 
-      player = Player |> preload(:scores) |> Repo.get(player.id)
-      [%{score: score}] = player.scores
-      assert score == 500
+        player = Player |> preload(:scores) |> Repo.get(player.id)
+        assert Enum.count(player.scores) === 0
+      end
 
-      cleanup(player)
-    end
+    test "does not persist score when lower than player's high score",
+      %{socket: socket, state: state} do
+        player = create_player(socket)
+        Repo.insert!(%Score{score: 500, player_id: player.id})
+
+        %{player: current_player, rules: rules} = state
+        new_player = Map.replace(current_player, :cash, 4000)
+        new_rules = Map.replace(rules, :turns_left, 0)
+        new_state = Map.replace(state, :player, new_player)
+        new_state = Map.replace(new_state, :rules, new_rules)
+        :sys.replace_state(Game.via_tuple("bob"), fn _ -> new_state end)
+
+        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        assert_reply ref, :ok, %{state_data: _state_data}
+
+        player = Player |> preload(:scores) |> Repo.get(player.id)
+        [%{score: score}] = player.scores
+        assert score == 500
+
+        cleanup(player)
+      end
 
     test "does not persist score when score is nil", %{socket: socket} do
       player = create_player(socket)
 
-      ref = push(socket, "end_game", %{score: nil, hash_id: player.hash_id})
+      ref = push(socket, "end_game", %{hash_id: player.hash_id})
       assert_reply ref, :ok, %{state_data: _state_data}
 
       player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -107,7 +135,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
     test "does not persist a score of 0", %{socket: socket} do
       player = create_player(socket)
 
-      ref = push(socket, "end_game", %{score: 0, hash_id: player.hash_id})
+      ref = push(socket, "end_game", %{hash_id: player.hash_id})
       assert_reply ref, :ok, %{state_data: _state_data}
 
       player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -116,56 +144,86 @@ defmodule FutureButcherApiWeb.GameChannelTest do
       cleanup(player)
     end
 
-    test "persists valid score", %{socket: socket} do
+    test "persists valid score", %{socket: socket, state: state} do
       player = create_player(socket)
 
-      assert Enum.count(player.scores) == 0
+      %{player: current_player, rules: rules} = state
+      new_player = Map.replace(current_player, :cash, 4000)
+      new_player = Map.replace(new_player, :debt, 0)
+      new_rules = Map.replace(rules, :turns_left, 0)
+      new_state = Map.replace(state, :player, new_player)
+      new_state = Map.replace(new_state, :rules, new_rules)
+      :sys.replace_state(Game.via_tuple("bob"), fn _ -> new_state end)
 
-      ref = push(socket, "end_game", %{score: 200, hash_id: player.hash_id})
+      assert Enum.count(player.scores) === 0
+
+      ref = push(socket, "end_game", %{hash_id: player.hash_id})
       assert_reply ref, :ok, %{state_data: _state_data}
 
-      score = Score |> Repo.get_by!(player_id: player.id)
-      assert score.score == 200
-      assert score.player_id == player.id
+      updated_player = Player |> preload(:scores) |> Repo.get(player.id)
+      assert Enum.count(updated_player.scores) === 1
+      [%{score: score}] = updated_player.scores
+      assert score === 4000
+      # score = Score |> Repo.get_by!(player_id: player.id)
+      # assert score.score == 200
+      # assert score.player_id == player.id
 
       cleanup(player)
     end
 
-    test "replaces high score with new higher score", %{socket: socket} do
-      player = create_player(socket)
-      Repo.insert!(%Score{score: 400, player_id: player.id})
+    test "replaces high score with new higher score",
+      %{socket: socket, state: state} do
+        player = create_player(socket)
+        Repo.insert!(%Score{score: 400, player_id: player.id})
 
-      player = Player |> preload(:scores) |> Repo.get(player.id)
-      assert Enum.count(player.scores) == 1
+        %{player: current_player, rules: rules} = state
+        new_player = Map.replace(current_player, :cash, 4000)
+        new_player = Map.replace(new_player, :debt, 0)
+        new_rules = Map.replace(rules, :turns_left, 0)
+        new_state = Map.replace(state, :player, new_player)
+        new_state = Map.replace(new_state, :rules, new_rules)
+        :sys.replace_state(Game.via_tuple("bob"), fn _ -> new_state end)
 
-      ref = push(socket, "end_game", %{score: 600, hash_id: player.hash_id})
-      assert_reply ref, :ok, %{state_data: _state_data}
+        player = Player |> preload(:scores) |> Repo.get(player.id)
+        assert Enum.count(player.scores) == 1
 
-      player = Player |> preload(:scores) |> Repo.get(player.id)
-      assert Enum.count(player.scores) == 1
-      [%{score: score}] = player.scores
-      assert score == 600
+        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        assert_reply ref, :ok, %{state_data: _state_data}
 
-      cleanup(player)
-    end
+        player = Player |> preload(:scores) |> Repo.get(player.id)
+        assert Enum.count(player.scores) == 1
+        [%{score: score}] = player.scores
+        assert score == 4000
 
-    test "replaces highest score with new higher score", %{socket: socket} do
-      player = create_player(socket)
-      Repo.insert!(%Score{score: 100, player_id: player.id})
-      Repo.insert!(%Score{score: 200, player_id: player.id})
+        cleanup(player)
+      end
 
-      player = Player |> preload(:scores) |> Repo.get(player.id)
-      assert Enum.count(player.scores) == 2
+    test "replaces highest score with new higher score",
+      %{socket: socket, state: state} do
+        player = create_player(socket)
+        Repo.insert!(%Score{score: 100, player_id: player.id})
+        Repo.insert!(%Score{score: 200, player_id: player.id})
 
-      ref = push(socket, "end_game", %{score: 600, hash_id: player.hash_id})
-      assert_reply ref, :ok, %{state_data: _state_data}
+        %{player: current_player, rules: rules} = state
+        new_player = Map.replace(current_player, :cash, 4000)
+        new_player = Map.replace(new_player, :debt, 0)
+        new_rules = Map.replace(rules, :turns_left, 0)
+        new_state = Map.replace(state, :player, new_player)
+        new_state = Map.replace(new_state, :rules, new_rules)
+        :sys.replace_state(Game.via_tuple("bob"), fn _ -> new_state end)
 
-      player = Player |> preload(:scores) |> Repo.get(player.id)
-      player.scores
-      |> Enum.each(& assert &1.score in [100, 600])
+        player = Player |> preload(:scores) |> Repo.get(player.id)
+        assert Enum.count(player.scores) == 2
 
-      cleanup(player)
-    end
+        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        assert_reply ref, :ok, %{state_data: _state_data}
+
+        player = Player |> preload(:scores) |> Repo.get(player.id)
+        player.scores
+        |> Enum.each(& assert &1.score in [100, 4000])
+
+        cleanup(player)
+      end
   end
 
   defp create_player(socket) do
