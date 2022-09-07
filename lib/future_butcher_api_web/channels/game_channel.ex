@@ -41,7 +41,6 @@ defmodule FutureButcherApiWeb.GameChannel do
     {:ok, _} = Presence.track(socket, socket.assigns.player_id, %{
       online_at: inspect(System.system_time(:second))
       })
-      Presence.list(socket) |> IO.inspect(label: "GameChannel | socket")
     {:noreply, socket}
   end
 
