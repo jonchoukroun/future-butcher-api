@@ -31,7 +31,7 @@ defmodule FutureButcherApiWeb.GameChannel do
       end
     end
 
-  def join("game:" <> _player, _payload) do
+  def join("game:" <> _player, _payload, _socket) do
     msg = "Invalid payload"
     Sentry.capture_message("Failed to join game", extra: %{extra: msg})
     {:error, %{reason: msg}}
