@@ -8,12 +8,13 @@ defmodule FutureButcherApiWeb.GameChannelTest do
   describe "join" do
     test "join succeeds for new player" do
       player_name = "frank"
-      assert {:ok, _payload, _socket} =
-        socket(UserSocket)
-        |> subscribe_and_join(
-          GameChannel,
-          "game:#{player_name}",
-          %{"player_name" => player_name})
+      {:ok, payload, socket} = socket(UserSocket) |> subscribe_and_join(
+        GameChannel,
+        "game:#{player_name}",
+        %{"player_name" => player_name}
+      )
+      assert is_binary(payload.hash_id)
+      assert socket.assigns.player_id === payload.hash_id
     end
 
     test "join fails when room has an existing player" do
@@ -34,14 +35,29 @@ defmodule FutureButcherApiWeb.GameChannelTest do
       ref = leave(socket)
       assert_reply ref, :ok
 
-      assert {:ok, _payload, _socket} =
+      assert {:ok, %{hash_id: new_hash}, socket} =
         socket(UserSocket)
         |> subscribe_and_join(GameChannel, "game:alice", %{
           "player_name" => "alice", "hash_id" => hash_id
         })
+      assert new_hash === hash_id
+      assert new_hash === socket.assigns.player_id
     end
 
-    @tag :skip
+    test "re-join succeeds when hash id matches existing player's hash id" do
+      {:ok, %{hash_id: hash_id}, _socket} =
+        socket(UserSocket)
+        |> subscribe_and_join(GameChannel, "game:alice", %{"player_name" => "alice"})
+
+      assert {:ok, %{hash_id: new_hash}, socket} =
+        socket(UserSocket)
+        |> subscribe_and_join(GameChannel, "game:alice", %{
+          "player_name" => "alice", "hash_id" => hash_id
+        })
+      assert new_hash === hash_id
+      assert new_hash === socket.assigns.player_id
+    end
+
     test "join fails with invalid payload" do
       assert {:error, %{reason: "Invalid payload"}} =
         socket(UserSocket)
