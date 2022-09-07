@@ -5,31 +5,31 @@ defmodule FutureButcherApiWeb.GameChannel do
   alias FutureButcherApi.{Repo, Player, Score}
   alias FutureButcherApiWeb.Presence
 
-  def join("game:" <> _player, %{"player_name" => name, "hash_id" => hash_id} = payload, socket) do
-    if authorized?(socket) do
-      send(self(), {:after_join, name})
-
-      retrieve_player(payload)
-      {:ok, %{hash_id: hash_id}, socket}
-    else
-      msg = "Unauthorized"
-      Sentry.capture_message("Failed to re-join socket", extra: %{extra: msg})
-      {:error, %{reason: msg}}
+  def join("game:" <> _player, %{"hash_id" => hash_id} = payload, socket)
+    when is_binary(hash_id) do
+      if authorized?(socket, hash_id) do
+        send(self(), :after_join)
+        player = retrieve_player(payload)
+        {:ok, %{hash_id: hash_id}, assign(socket, :player_id, player.hash_id)}
+      else
+        msg = "Unauthorized"
+        Sentry.capture_message("Failed to re-join socket", extra: %{extra: msg})
+        {:error, %{reason: msg}}
+      end
     end
-  end
 
-  def join("game:" <> _player, %{"player_name" => name} = payload, socket) do
-    if authorized?(socket) do
-      send(self(), {:after_join, name})
-
-      player = persist_player(payload)
-      {:ok, %{hash_id: player.hash_id}, socket}
-    else
-      msg = "Unauthorized"
-      Sentry.capture_message("Failed to join socket", extra: %{extra: msg})
-      {:error, %{reason: msg}}
+  def join("game:" <> _player, %{"player_name" => name} = payload, socket)
+    when is_binary(name) do
+      if authorized?(socket) do
+        player = persist_player(payload)
+        send(self(), :after_join)
+        {:ok, %{hash_id: player.hash_id}, assign(socket, :player_id, player.hash_id)}
+      else
+        msg = "Unauthorized"
+        Sentry.capture_message("Failed to join socket", extra: %{extra: msg})
+        {:error, %{reason: msg}}
+      end
     end
-  end
 
   def join("game:" <> _player, _payload) do
     msg = "Invalid payload"
@@ -37,10 +37,11 @@ defmodule FutureButcherApiWeb.GameChannel do
     {:error, %{reason: msg}}
   end
 
-  def handle_info({:after_join, screen_name}, socket) do
-    {:ok, _} = Presence.track(socket, screen_name, %{
+  def handle_info(:after_join, socket) do
+    {:ok, _} = Presence.track(socket, socket.assigns.player_id, %{
       online_at: inspect(System.system_time(:second))
       })
+      Presence.list(socket) |> IO.inspect(label: "GameChannel | socket")
     {:noreply, socket}
   end
 
@@ -225,15 +226,21 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   # Validations ----------------------------------------------------------------
 
-  defp number_of_players(socket) do
+  defp validate_player_hash([], _hash_id), do: true
+  defp validate_player_hash([player_id], hash_id) do
+    player_id === hash_id
+  end
+  defp validate_player_hash(_, _), do: false
+
+  defp authorized?(socket) do
+    socket |> Presence.list() |> Map.keys |> length() === 0
+  end
+
+  defp authorized?(socket, hash_id) do
     socket
     |> Presence.list()
     |> Map.keys()
-    |> length()
-  end
-
-  defp authorized?(socket) do
-    number_of_players(socket) == 0
+    |> validate_player_hash(hash_id)
   end
 
 
