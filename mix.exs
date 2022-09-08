@@ -4,7 +4,7 @@ defmodule FutureButcherApi.Mixfile do
   def project do
     [
       app: :future_butcher_api,
-      version: "0.2.2",
+      version: "0.3.0",
       elixir: "~> 1.13.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
@@ -45,7 +45,7 @@ defmodule FutureButcherApi.Mixfile do
       {:jason, "~> 1.1"},
       {:cors_plug, "~> 1.5"},
       {:faker, "~> 0.17"},
-      {:future_butcher_engine, "~> 1.0.3"},
+      {:future_butcher_engine, "~> 1.2.0"},
       {:sentry, "~> 8.0"},
       {:hackney, "~> 1.8"}
     ]
