@@ -149,6 +149,13 @@ defmodule FutureButcherApiWeb.GameChannel do
 
   # Health Clinic --------------------------------------------------------------
 
+  def handle_in("buy_oil", _payload, socket) do
+    case Game.buy_oil((via(socket.topic))) do
+      {:ok, state_data} -> reply_success(state_data, socket)
+      {:error, reason} -> reply_failure(reason, socket)
+    end
+  end
+
   def handle_in("restore_health", _payload, socket) do
     case Game.restore_health(via(socket.topic)) do
       {:ok, state_data} -> reply_success(state_data, socket)
