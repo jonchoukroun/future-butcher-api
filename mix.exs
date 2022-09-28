@@ -45,7 +45,7 @@ defmodule FutureButcherApi.Mixfile do
       {:jason, "~> 1.1"},
       {:cors_plug, "~> 1.5"},
       {:faker, "~> 0.17"},
-      {:future_butcher_engine, "~> 1.2.0"},
+      {:future_butcher_engine, "~> 1.3.0"},
       {:sentry, "~> 8.0"},
       {:hackney, "~> 1.8"}
     ]
