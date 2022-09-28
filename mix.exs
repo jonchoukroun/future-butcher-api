@@ -4,7 +4,7 @@ defmodule FutureButcherApi.Mixfile do
   def project do
     [
       app: :future_butcher_api,
-      version: "0.3.0",
+      version: "0.4.0",
       elixir: "~> 1.13.4",
       elixirc_paths: elixirc_paths(Mix.env),
       compilers: [:phoenix, :gettext] ++ Mix.compilers,
