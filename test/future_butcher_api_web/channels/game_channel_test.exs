@@ -107,7 +107,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
           fn state -> %{state | player: new_player} end
         )
 
-        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        ref = push(socket, "end_game", %{player_name: player.name})
         assert_reply ref, :ok, %{state_data: _state_data}
 
         player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -126,7 +126,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
         new_state = Map.replace(new_state, :rules, new_rules)
         :sys.replace_state(Game.via_tuple("bob"), fn _ -> new_state end)
 
-        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        ref = push(socket, "end_game", %{player_name: player.name})
         assert_reply ref, :ok, %{state_data: _state_data}
 
         player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -139,7 +139,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
     test "does not persist score when score is nil", %{socket: socket} do
       player = create_player(socket)
 
-      ref = push(socket, "end_game", %{hash_id: player.hash_id})
+      ref = push(socket, "end_game", %{player_name: player.name})
       assert_reply ref, :ok, %{state_data: _state_data}
 
       player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -151,7 +151,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
     test "does not persist a score of 0", %{socket: socket} do
       player = create_player(socket)
 
-      ref = push(socket, "end_game", %{hash_id: player.hash_id})
+      ref = push(socket, "end_game", %{player_name: player.name})
       assert_reply ref, :ok, %{state_data: _state_data}
 
       player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -173,7 +173,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
 
       assert Enum.count(player.scores) === 0
 
-      ref = push(socket, "end_game", %{hash_id: player.hash_id})
+      ref = push(socket, "end_game", %{player_name: player.name})
       assert_reply ref, :ok, %{state_data: _state_data}
 
       updated_player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -203,7 +203,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
         player = Player |> preload(:scores) |> Repo.get(player.id)
         assert Enum.count(player.scores) == 1
 
-        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        ref = push(socket, "end_game", %{player_name: player.name})
         assert_reply ref, :ok, %{state_data: _state_data}
 
         player = Player |> preload(:scores) |> Repo.get(player.id)
@@ -231,7 +231,7 @@ defmodule FutureButcherApiWeb.GameChannelTest do
         player = Player |> preload(:scores) |> Repo.get(player.id)
         assert Enum.count(player.scores) == 2
 
-        ref = push(socket, "end_game", %{hash_id: player.hash_id})
+        ref = push(socket, "end_game", %{player_name: player.name})
         assert_reply ref, :ok, %{state_data: _state_data}
 
         player = Player |> preload(:scores) |> Repo.get(player.id)
