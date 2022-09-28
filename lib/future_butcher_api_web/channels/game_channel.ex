@@ -78,7 +78,7 @@ defmodule FutureButcherApiWeb.GameChannel do
     end
   end
 
-  def handle_in("end_game", %{"hash_id" => hash_id}, socket) do
+  def handle_in("end_game", %{"player_name" => player_name}, socket) do
     "game:" <> player = socket.topic
     %{
       player: %{
@@ -90,8 +90,8 @@ defmodule FutureButcherApiWeb.GameChannel do
       }
     } = :sys.get_state(Game.via_tuple(player))
 
-    if turns_left === 0 do
-      persist_score_if_valid(cash - debt, hash_id)
+    if turns_left === 0 && player_name === player do
+      persist_score_if_valid(cash - debt, player)
     end
 
     case GameSupervisor.stop_game(player) do
@@ -282,17 +282,17 @@ defmodule FutureButcherApiWeb.GameChannel do
               select:   %{player: p.name, score: s.score}
   end
 
-  defp persist_score_if_valid(score, hash_id)
+  defp persist_score_if_valid(score, player_name)
     when is_nil(score)
-    when not is_binary(hash_id), do: :ok
+    when not is_binary(player_name), do: :ok
 
   defp persist_score_if_valid(score, _) when score <= 0, do: :ok
 
-  defp persist_score_if_valid(score, hash_id) do
+  defp persist_score_if_valid(score, player_name) do
     scores = from(s in Score,
       order_by: [desc: :score],
       join: p in assoc(s, :player),
-      where: p.hash_id == ^hash_id,
+      where: p.name == ^player_name,
       preload: [player: p])
     |> Repo.all()
 
@@ -303,7 +303,7 @@ defmodule FutureButcherApiWeb.GameChannel do
         Repo.insert!(%Score{score: score, player_id: high_score.player_id})
       end
     else
-      player = Repo.get_by!(Player, %{hash_id: hash_id})
+      player = Repo.get_by!(Player, %{name: player_name})
       Repo.insert!(%Score{score: score, player_id: player.id})
     end
   end
